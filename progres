@@ -1,0 +1,16 @@
+import requests
+url = "http://api.probasketballapi.com/advanced/player"
+url = "http://api.probasketballapi.com/game"
+first_name = input("Enter a player's first name: ")
+last_name = input("Enter a player's last name: ")
+season = input("Enter a season date, YYYY: ")
+
+data = {
+    "api_key": "kXBAdMeKfOwS7WzolGrPDHtpITxQqZ5n",
+    "first_name": first_name,
+    "last_name": last_name,
+    "season": season,
+
+}
+response = requests.post(url, data=data)
+response.json()
