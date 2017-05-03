@@ -1,0 +1,61 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox as m
+import requests
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+
+API_KEY = "kXBAdMeKfOwS7WzolGrPDHtpITxQqZ5n"
+STAT_URL = "http://api.probasketballapi.com/player?api_key=%s" % API_KEY
+DATA_URL = "http://api.probasketballapi.com/boxscore/player?api_key=%s" % API_KEY + "&player_id=%s"
+ 
+class App(tk.Tk):
+
+    def __init__(self):
+
+        tk.Tk.__init__(self)
+        self.wm_title("Player Analysis Since 2010")
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+
+        self.player_ids = {}
+        self.get_player_names()
+        self.player_names = list(self.player_ids.keys())
+
+        tk.Label(self, text='Player One').\
+            grid(row=0, column=0, sticky="nsew")
+        tk.Label(self, text='Player Two').\
+            grid(row=1, column=0, sticky="nsew")
+        self.player_one = ttk.Combobox(self, state='readonly',
+            values=self.player_names)
+        self.player_two = ttk.Combobox(self, state='readonly',
+            values=self.player_names)
+        self.player_one.grid(row=0, column=1, sticky="nsew")
+        self.player_two.grid(row=1, column=1, sticky="nsew")
+
+        
+        self.player_one.current(0)
+        self.player_two.current(1)
+
+        self.init_player_stats()
+
+        self.compare = tk.Button(self, text='Compare Players',
+            command=self.compare_players)
+        self.compare.grid(row=3, column=0, 
+            columnspan=2, sticky="nsew")
+
+    def init_player_stats(self):
+
+        self.player_one_stats = {
+            'points': 0,
+            'rebounds': 0,
+            'steals': 0,
+            'assists': 0,
+        }
+        self.player_two_stats = {
+            'points': 0,
+            'rebounds': 0,
+            'steals': 0,
+            'assists': 0,
+        }
