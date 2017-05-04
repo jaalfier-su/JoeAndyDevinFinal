@@ -59,3 +59,79 @@ class App(tk.Tk):
             'steals': 0,
             'assists': 0,
         }
+
+
+    def display_bar_graph(self):
+
+        n_groups = 4
+        p1_data = (
+            self.player_one_stats['points'], 
+            self.player_one_stats['rebounds'],
+            self.player_one_stats['steals'],
+            self.player_one_stats['assists']
+        )
+        p2_data = (
+            self.player_two_stats['points'], 
+            self.player_two_stats['rebounds'],
+            self.player_two_stats['steals'],
+            self.player_two_stats['assists']
+        )
+         
+        fig, ax = plt.subplots()
+        index = np.arange(n_groups)
+        bar_width = 0.35
+        opacity = 0.8
+         
+        rects1 = plt.bar(index, p1_data, bar_width,
+                         alpha=opacity, color='b',
+                         label=self.player_one.get())
+         
+        rects2 = plt.bar(index + bar_width, p2_data, bar_width,
+                         alpha=opacity, color='g',
+                         label=self.player_two.get())
+         
+        plt.xlabel('Category')
+        plt.ylabel('Stat Quantity')
+        plt.title('Player Statistics Since 2010')
+        plt.xticks(index + bar_width, 
+            ('Points', 'Rebounds', 'Steals', 'Assists'))
+        plt.legend()
+         
+        plt.tight_layout()
+        plt.show()
+
+    def get_player_names(self):
+
+        r = requests.post(STAT_URL)
+        for item in r.json():
+            self.player_ids[item['player_name']] = {'id': item['id'],
+                'team_id': item['team_id'],
+            }
+
+    def get_id(self, stringvar):
+
+        return self.player_ids[stringvar.get()]['id']
+
+    def get_post(self, stringvar):
+
+        r = requests.post(DATA_URL % self.get_id(stringvar))
+        return r.json()
+
+    def sum_stats(self, player_json, player_dict):
+
+        for item in player_json:
+            stl = int(item['stl'] or 0)
+            reb = int(item['dreb'] or 0)
+            reb += int(item['oreb'] or 0)
+            pts = int(item['pts'] or 0)
+            ast = int(item['ast'] or 0)
+            getattr(self, player_dict)['points'] += pts
+            getattr(self, player_dict)['rebounds'] += reb
+            getattr(self, player_dict)['steals'] += stl
+            getattr(self, player_dict)['assists'] += ast
+        pts = getattr(self, player_dict)['points']
+        rbnds = getattr(self, player_dict)['rebounds']
+        stls = getattr(self, player_dict)['steals']
+        asts = getattr(self, player_dict)['assists']
+        _sum = pts + rbnds + stls + asts
+        return _sum
