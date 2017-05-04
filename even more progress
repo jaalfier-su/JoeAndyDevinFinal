@@ -135,3 +135,30 @@ class App(tk.Tk):
         asts = getattr(self, player_dict)['assists']
         _sum = pts + rbnds + stls + asts
         return _sum
+def compare_stats(self):
+
+        p1_json = self.get_post(self.player_one)
+        p2_json = self.get_post(self.player_two)
+        p1_sum = self.sum_stats(p1_json, "player_one_stats")
+        p2_sum = self.sum_stats(p2_json, "player_two_stats")
+        if p1_sum > p2_sum:
+            m.showinfo("Results", self.player_one.get() + 
+                " is better with a total fantasy score of %d." % p1_sum)
+        else:
+            m.showinfo("Results", self.player_two.get() + 
+                " is better with a total fantasy score of %d." % p2_sum)
+        self.display_bar_graph()
+
+    def compare_players(self):
+
+        if self.player_one.get() == self.player_two.get():
+            m.showerror("Invalid Input!",
+                "You must enter two different players!")
+        else:
+            self.init_player_stats()
+            self.compare_stats()
+
+if __name__ == '__main__':
+
+    app = App()
+    app.mainloop()
